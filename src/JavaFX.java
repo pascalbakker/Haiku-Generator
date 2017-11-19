@@ -72,7 +72,6 @@ public class JavaFX extends Application{
 		                case "Trump": hg.setNewFile("trump.txt");
 		                break;
 		                default: System.out.println("Error changing values");
-
 	                }
                 }catch(IOException ioe){
                 	System.out.println(ioe);
