@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HaikuGenerator {
+	//Add 1 to the desired number of syllables per line.(Ex. if you want 5 syllables set to 6W)
 	public static final int[] syllableCount = {6,8,6};
 	HashMap<String,List<WordProb>> markov;
 	
@@ -44,7 +45,6 @@ public class HaikuGenerator {
 				for(int i=0;i<firstline.size();i++){
 					sum+=syllableCount(firstline.get(i));
 				}
-				System.out.println("Sum1 "+sum);
 			}
 			
 			sum=0;
@@ -59,7 +59,6 @@ public class HaikuGenerator {
 				for(int i=0;i<secondline.size();i++){
 					sum+=syllableCount(secondline.get(i));
 				}
-				System.out.println("Sum2 "+sum);
 			}
 			//Third line
 			while(sum!=syllableCount[2]-1){
@@ -70,7 +69,6 @@ public class HaikuGenerator {
 				for(int i=0;i<thirdline.size();i++){
 					sum+=syllableCount(thirdline.get(i));
 				}
-				System.out.println("Sum3 "+sum);
 			}
 			//If not haiku redo
 			if(!(firstline.isEmpty()||secondline.isEmpty()||thirdline.isEmpty()))
@@ -80,21 +78,21 @@ public class HaikuGenerator {
 		//Print the haiku
 		//First line
 		for(String word: firstline){
-			System.out.print(word+" "+syllableCount(word));
+			System.out.print(word+" ");
 			sentence+=word+" ";
 		}
 		sentence+="\n";
 		System.out.println();
 		//Second line
 		for(String word: secondline){
-			System.out.print(word+" "+syllableCount(word));
+			System.out.print(word+" ");
 			sentence+=word+" ";
 		}
 		sentence+="\n";
 		System.out.println();
 		//Third line
 		for(String word: thirdline){
-			System.out.print(word+" "+syllableCount(word));
+			System.out.print(word+" ");
 			sentence+=word+" ";
 		}
 		sentence+="\n";
@@ -103,12 +101,13 @@ public class HaikuGenerator {
 	}
 	
 	public ArrayList<String> DFS(String starting,int desiredSyllables, boolean isStart,int numofpaths){
+		//If not start of haiku, set starting word to a neighbor of the starting word
 		if(!isStart){
 			Random r = new Random();
 			List<String> keys = new ArrayList<String>(markov.keySet());
 			starting = keys.get( r.nextInt(keys.size()) );	
 		}
-
+		
 		int numSyllables = 0;
 		WordProb startingWP = new WordProb(starting,0);
 		ArrayList<String> sentence = new ArrayList<String>();
@@ -122,7 +121,7 @@ public class HaikuGenerator {
 		stack.push(startingWP);
 		numSyllables+=syllableCount(startingWP.word);
 		
-		
+		//Find a path that is desired Syllables long using DFS
 		while(!stack.isEmpty()){
 			WordProb element = stack.pop();
 			visited.put(element.word, true);
@@ -138,16 +137,6 @@ public class HaikuGenerator {
 			
 			//If x syllables, print result
 			if(numSyllables+wordSyl==desiredSyllables){
-				/*
-				System.out.println("Complete: ");
-				for(int i=0;i<sentence.size();i++){
-					System.out.print(sentence.get(i)+" ");
-				}
-				
-				for(int i=0;i<sentence.size();i++){
-					System.out.print(syllableCount(sentence.get(i))+" ");
-				}
-								*/
 				break;
 			}
 			
@@ -164,15 +153,20 @@ public class HaikuGenerator {
 		//boolean islastupper = !sentence.get(sentence.size()-1).equals(sentence.get(sentence.size()-1).toLowerCase());
 		if(numSyllables<desiredSyllables&&numofpaths>0||sentence.size()<1){
 			try{
-			DFS(starting,desiredSyllables,isStart,numofpaths-1);
+				DFS(starting,desiredSyllables,isStart,numofpaths-1);
 			}catch(StackOverflowError sofe){
-				System.out.println(sofe+" "+numofpaths);
+				System.out.println(sofe+" "+numofpaths+"");
 			}
 		}
 		
 		return sentence;
 	}	
 	
+	/** Finds the number of syllables in a word or phrase
+	 * 
+	 * @param word String to parse through
+	 * @return an integer.
+	 */
 	public int syllableCount(String word){
 		word = word.toLowerCase();
 		//Syllable pattern matcher
@@ -192,15 +186,23 @@ public class HaikuGenerator {
 		if(syllableCount==0)
 			return 1;
 		
+		if(word.subSequence(word.length()-1, word.length()-1).equals("y")&&word.length()>2)
+			syllableCount++;
 		return syllableCount;
 	}
 	
+	/** Change the file that the haiku program learns from
+	 * 
+	 * @param link file location
+	 * @throws FileNotFoundException
+	 */
 	public void setNewFile(String link) throws FileNotFoundException{
 		File learningFile = new File(link);
 		if(!learningFile.exists())
 			throw new IllegalArgumentException("File must exist!");
 		ProbabilityGenerator pg = new ProbabilityGenerator(learningFile);
 		pg.generateProbability();
+		markov.clear();
 		markov = pg.getProbabilties();
 	}
 	

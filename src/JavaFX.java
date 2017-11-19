@@ -23,6 +23,7 @@ import javafx.stage.Stage;
 
 public class JavaFX extends Application{
 	public String source;
+	HaikuGenerator hg;
 	public static void main(String[] args) {
         launch(args);
     }
@@ -30,7 +31,7 @@ public class JavaFX extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		//Haiku Code
-		HaikuGenerator hg = new HaikuGenerator(new File("navyseal.txt"));
+		hg = new HaikuGenerator(new File("navyseal.txt"));
 		Random r = new Random();
 
 		
@@ -50,7 +51,7 @@ public class JavaFX extends Application{
         });
         //Observable list
         ListView<String> list = new ListView<String>();
-        ObservableList<String> items = FXCollections.observableArrayList("Shakespeare","Alice&Wonderland","Navy Seal","Trump");
+        ObservableList<String> items = FXCollections.observableArrayList("Going 100 West","Alice&Wonderland","Navy Seal","Trump");
         list.setItems(items);
         list.setPrefWidth(100);
         list.setPrefHeight(70);
@@ -62,13 +63,17 @@ public class JavaFX extends Application{
                 String clickedon = list.getSelectionModel().getSelectedItem();
                 try{
 	                switch(clickedon){
-		                case "Shakespeare": hg.setNewFile("t8.shakespeare.txt");
+		                case "Going 100 West": hg.setNewFile("100west.txt");
+		                break;
 		                case "Alice&Wonderland":hg.setNewFile("sample.txt");
+		                break;
 		                case "Navy Seal": hg.setNewFile("navyseal.txt");
+		                break;
 		                case "Trump": hg.setNewFile("trump.txt");
-	                
+		                break;
+		                default: System.out.println("Error changing values");
+
 	                }
-	                hg.generateHaiku();
                 }catch(IOException ioe){
                 	System.out.println(ioe);
                 	}
@@ -84,7 +89,7 @@ public class JavaFX extends Application{
         BorderPane.setAlignment(haikuText, Pos.CENTER);
         root.setBottom(haikuText);
 		
-        primaryStage.setScene(new Scene(root, 500, 150));
+        primaryStage.setScene(new Scene(root, 500, 225));
         primaryStage.show();
 	}
 }
